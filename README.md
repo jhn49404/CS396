@@ -1,7 +1,10 @@
 CS396
 =====
 
-CS396
+A project.
+
+Enh Way
+===
 
 git init
 
@@ -13,4 +16,11 @@ git commit -a -m "MESSAGE"
 
 git push github
 
-test.
+Easy Way
+===
+
+Ctrl+shift+p, "quick commit" => message
+
+$ cd desktop\cs396
+
+$ git push github => userpass
