@@ -3,4 +3,4 @@ CS396
 
 CS396
 
-Hello world?
+Hello world!
