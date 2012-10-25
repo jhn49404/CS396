@@ -12,3 +12,5 @@ git pull github
 git commit -a -m "MESSAGE"
 
 git push github
+
+test.
