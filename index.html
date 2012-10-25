@@ -1,0 +1,15 @@
+<!doctype html>
+<html ng-app>
+	<head>
+		<title>gudenof</title>
+		<script type="text/javascript" src="libs/angular-1.0.2/angular.min.js"></script>
+		<script type="text/javascript" src="humans.js"></script>
+		<script type="text/javascript" src="computers.js"></script>
+		<script type="text/javascript" src="controller.js"></script>
+	</head>
+	<body ng-controller="BlobsCtrl">
+		<input type="text" ng-repeat="name in names" ng-model="name.text" />
+		<h1 ng-repeat="name in names" ng-show="name" ng-click="shitbrix(name)">Hello, {{name.text}}!</h1>
+		<button ng-click="add()">Add</button>
+	</body>
+</html>
