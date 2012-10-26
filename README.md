@@ -19,7 +19,7 @@ How to Edit with Git
 
 $ git commit -a -m "MESSAGE"
 
-$ git push github
+$ git push github master
 
 Notes
 ===
