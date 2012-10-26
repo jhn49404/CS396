@@ -10,6 +10,10 @@ How to Checkout with Git
 
 Have Joe add you as a contributor.
 
+$ mkdir cs396
+
+$ cd cs396
+
 $ git init
 
 $ git remote add github https://github.com/jhn49404/CS396.git
@@ -32,3 +36,8 @@ When it's time to sync with the repo, do:
 $ git pull --rebase github master
 
 $ git push github master
+
+When All Else Fails
+===
+
+http://gitref.org/
