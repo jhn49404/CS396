@@ -1,26 +1,31 @@
 CS396
 =====
 
-A project.
+A project for a class.
 
-Enh Way
+How to Checkout with Git
 ===
 
-git init
+(because we're noobs at this)
 
-git remote add github https://github.com/jhn49404/CS396.git
+$ git init
 
-git pull github
+$ git remote add github https://github.com/jhn49404/CS396.git
 
-git commit -a -m "MESSAGE"
+$ git pull github master
 
-git push github
-
-Easy Way
+How to Edit with Git
 ===
 
-Ctrl+shift+p, "quick commit" => message
+$ git commit -a -m "MESSAGE"
 
-$ cd desktop\cs396
+$ git push github
 
-$ git push github => userpass
+Notes
+===
+
+Commit updates only your local repository. Push updates github.
+
+Make sure to pull from github occasionally to keep all of our code in check.
+
+Sublime text has a nifty shortcut (with the Git plugin installed) to commit: Ctrl+shift+p, "quick commit" => message.
