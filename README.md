@@ -19,7 +19,13 @@ $ git pull github master
 How to Edit with Git
 ===
 
+After you make some significant progress, do:
+
 $ git commit -a -m "MESSAGE"
+
+When it's time to sync with the repo, do:
+
+$ git pull --rebase github master
 
 $ git push github master
 
