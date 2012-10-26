@@ -12,9 +12,13 @@ Fork on github.
 
 $ git init
 
-$ git remote add github https://github.com/USERNAME/CS396.git
+$ git remote add origin https://github.com/USERNAME/CS396.git
 
-$ git pull github master
+$ git remote add upstream https://github.com/jhn49404/CS396.git
+
+(These will be the same for you Joe.)
+
+$ git pull origin master
 
 How to Edit with Git
 ===
