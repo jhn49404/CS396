@@ -8,7 +8,7 @@ How to Checkout with Git
 
 (because we're noobs at this)
 
-Fork on github.
+Have Joe add you as a contributor.
 
 $ git init
 
