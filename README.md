@@ -8,9 +8,11 @@ How to Checkout with Git
 
 (because we're noobs at this)
 
+Fork on github.
+
 $ git init
 
-$ git remote add github https://github.com/jhn49404/CS396.git
+$ git remote add github https://github.com/USERNAME/CS396.git
 
 $ git pull github master
 
