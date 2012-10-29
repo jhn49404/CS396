@@ -23,6 +23,10 @@ $ git pull github master
 How to Edit with Git
 ===
 
+After you add files/folders, do:
+
+$ git add FILE
+
 After you make some significant progress, do:
 
 $ git commit -a -m "MESSAGE"
