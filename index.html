@@ -38,7 +38,7 @@
 	<body ng-controller="BlobsCtrl">
 		<div class="board">
 			<div class="row" ng-repeat="row in board">
-				<div class="cell" ng-repeat="cell in row">
+				<div class="cell" ng-repeat="cell in row" ng-click="activeAI.handleClick(cell.i, cell.j)">
 					<img ng-show="cell.color" ng-src="img/{{cell.color}}.png" />
 				</div>
 			</div>

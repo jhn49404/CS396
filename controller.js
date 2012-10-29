@@ -17,15 +17,39 @@ function BlobsCtrl($scope){
 
 	$scope.board[0][0].color = $scope.board[6][6].color = "black";
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
-	$scope.shitbrix = function(msg){
-		console.log(msg)
-	};
 
-	$scope.add = function(){
-		$scope.names.push({});
-	};
+	var whiteAI = HumanAI("white");
+	var blackAI = RandomAI("black");
+	$scope.activeAI = whiteAI;
 
-	$scope.names = [{
-		text: "World"
-	}];
+	// NOTE: makeMove will be defined by the time passTurn is called
+	function passTurn(){
+		$scope.activeAI = $scope.activeAI==whiteAI? blackAI : whiteAI;
+		makeMove();
+	}
+
+	function winOrPass(){
+		if (false){ // TODO check for endgame
+			// ...
+		} else {
+			passTurn();
+		}
+	}
+
+	function makeMove(){
+		// NOTE: if choose is concurrent, then the stack will be cleared up here
+		$scope.activeAI.choose($scope.board, function(move){
+			// NOTE: move stores the changes to be made to the board
+			// e.g., move = [{i:0, j:0, color:"white"}, ...]
+			for (m in move){
+				var change = move[m];
+				board[change.i][change.j].color = change.color;
+			}
+
+			$scope.$apply();
+			winOrPass();
+		});
+	}
+
+	makeMove();
 }
