@@ -6,10 +6,42 @@
 		<script type="text/javascript" src="humans.js"></script>
 		<script type="text/javascript" src="computers.js"></script>
 		<script type="text/javascript" src="controller.js"></script>
+		<style type="text/css">
+			body {
+				background: #e1d59d;
+			}
+
+			.board {
+				float: left;
+				width: 462px;
+				height: 462px;
+				border: 1px solid black;
+			}
+
+			.row {
+				float: left;
+				width: 462px;
+				height: 64px;
+				border-top: 1px solid black;
+				border-bottom: 1px solid black;
+			}
+
+			.cell {
+				float: left;
+				width: 64px;
+				height: 64px;
+				border-right: 1px solid black;
+				border-left: 1px solid black;
+			}
+		</style>
 	</head>
 	<body ng-controller="BlobsCtrl">
-		<input type="text" ng-repeat="name in names" ng-model="name.text" />
-		<h1 ng-repeat="name in names" ng-show="name" ng-click="shitbrix(name)">Hello, {{name.text}}!</h1>
-		<button ng-click="add()">Add</button>
+		<div class="board">
+			<div class="row" ng-repeat="row in board">
+				<div class="cell" ng-repeat="cell in row">
+					<img ng-show="cell.color" ng-src="img/{{cell.color}}.png" />
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
