@@ -18,8 +18,8 @@ function BlobsCtrl($scope){
 	$scope.board[0][0].color = $scope.board[6][6].color = "black";
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
 
-	var whiteAI = HumanAI("white");
-	var blackAI = RandomAI("black");
+	var whiteAI = HumanAI("white", $scope.board);
+	var blackAI = RandomAI("black", $scope.board);
 	$scope.activeAI = whiteAI;
 
 	// NOTE: makeMove will be defined by the time passTurn is called
@@ -38,7 +38,7 @@ function BlobsCtrl($scope){
 
 	function makeMove(){
 		// NOTE: if choose is concurrent, then the stack will be cleared up here
-		$scope.activeAI.choose($scope.board, function(move){
+		$scope.activeAI.choose(function(move){
 			// NOTE: move stores the changes to be made to the board
 			// e.g., move = [{i:0, j:0, color:"white"}, ...]
 			for (m in move){
