@@ -1,3 +1,13 @@
+function isTerminal(state){
+	// TODO
+}
+
+function overChildren(state, cb){
+	// TODO
+	// build a child state, cb(child), repeat for all children
+	// remember to use palindromic pruning to not send two equivalent children
+}
+
 function RandomAI(color, board){
 	var self = {};
 	self.color = color;
@@ -13,20 +23,12 @@ function RandomAI(color, board){
 	return self;
 }
 
-function isTerminal(state){
-	// TODO
-}
-
 function heuristicValue(state){
 	// TODO
 	// blob field of white - blob field of black
 }
 
-function overChildren(state, cb){
-	// TODO
-	// build a child, cb(child), repeat for all children
-}
-
+// NOTE: minimax is a depth first search, so we can't use a timer based method
 function minimax(state, ply){
 	if (isTerminal(state) || ply <= 0){
 		return heuristicValue(state);
