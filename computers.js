@@ -1,21 +1,51 @@
+//// STATE ////
+
 // NOTE: initialize WITH "new" keyword
 function State(board){
 	// this.asdfasrgwerg = asdgasfdgasg
+	// ...
 
 	// NOTE: changes stores the changes made to the board
 	// e.g., changes[0] = [{i:0, j:0, color:"white"}, ...]
 	this.changes = [];
 }
 
-function isTerminal(state){
-	// TODO
-}
+
+//// HELPER FUNCTIONS ////
 
 function overChildren(state, cb){
 	// TODO
 	// build a child state, cb(child), repeat for all children
 	// remember to use palindromic pruning to not send two equivalent children
 }
+
+function isTerminal(state){
+	// TODO
+}
+
+function heuristicValue(state){
+	// TODO
+	// blob field of white - blob field of black
+}
+
+// NOTE: minimax is a depth first search, so we can't use a timer based method
+function minimax(state, ply){
+	if (isTerminal(state) || ply <= 0){
+		return heuristicValue(state);
+	} else {
+		alpha = -Infinity;
+
+		// NOTE: using callback form to simulate python's yield keyword
+		overChildren(state, function(child){
+			alpha = max(alpha, -minimax(child, ply-1));
+		});
+
+		return alpha;
+	}
+}
+
+
+//// AI CLASSES ////
 
 // NOTE: initialize WITHOUT "new" keyword
 function RandomAI(color, board){
@@ -48,27 +78,6 @@ function RandomAI(color, board){
 	return self;
 }
 
-function heuristicValue(state){
-	// TODO
-	// blob field of white - blob field of black
-}
-
-// NOTE: minimax is a depth first search, so we can't use a timer based method
-function minimax(state, ply){
-	if (isTerminal(state) || ply <= 0){
-		return heuristicValue(state);
-	} else {
-		alpha = -Infinity;
-
-		// NOTE: using callback form to simulate python's yield keyword
-		overChildren(state, function(child){
-			alpha = max(alpha, -minimax(child, ply-1));
-		});
-
-		return alpha;
-	}
-}
-
 // NOTE: initialize WITHOUT "new" keyword
 function MinimaxAI(color, board){
 	var self = {};
@@ -94,3 +103,5 @@ function MinimaxAI(color, board){
 // we want them to be initialized as quickly as possible.
 // Because we only initialize the AI once (when BlobCtrl loads),
 // we use the "self" method for them.
+// Think of "new" style objects as c structs, and "self" style
+// objects as python objects.
