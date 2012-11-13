@@ -20,9 +20,10 @@ function BlobsCtrl($scope){
 	$scope.counts = {white:2, black:2};
 
 	var whiteAI = HumanAI("white", $scope.board);
-	var blackAI = RandomAI("black", $scope.board);
+	var blackAI = MinimaxAI("black", $scope.board);
+	//var blackAI = RandomAI("black", $scope.board);
 	//var blackAI = HumanAI("black", $scope.board);
-	$scope.activeAI = whiteAI;
+	$scope.activeAI = blackAI;
 
 	function endGame(){
 		$scope.activeAI = null;

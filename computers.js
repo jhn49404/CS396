@@ -3,10 +3,7 @@
 // NOTE: initialize WITH "new" keyword
 function State(board, color){
 	this.board = board;
-	this.color = color;
-	// this.asdfasrgwerg = asdgasfdgasg
-	// ...
-
+	this.color = color; // who makes the next move
 	// NOTE: changes stores the changes made to the board
 	// e.g., changes[0] = [{i:0, j:0, color:"white"}, ...]
 	this.changes = [];
@@ -16,6 +13,7 @@ function State(board, color){
 //// HELPER FUNCTIONS ////
 
 function overChildren(state, cb){
+	// TODO use palindromic pruning to not send two equivalent children
 	var i = 7, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
 	while (i--){
 		j = 7;
@@ -88,33 +86,125 @@ function overChildren(state, cb){
 			}
 		}
 	}
-	// TODO
-	// build a child state, cb(child), repeat for all children
-	// remember to use palindromic pruning to not send two equivalent children
 }
 
 function isTerminal(state){
 	// TODO
+	return false;
+}
+
+function applyChanges(board, changes){
+	for (i in changes){
+		var change = changes[i];
+		for (j in change){
+			var piece = change[j];
+			board[piece.i][piece.j].color = piece.color;
+		}
+	}
+}
+
+function undoChanges(board, changes){
+	var i = changes.length;
+	while (i--){
+		var change = changes[i];
+		if (change.length == 1){
+			var piece = change[0];
+			board[piece.i][piece.j].color = "";
+		} else if (change.length == 2){
+			var blank, piece;
+			if (change[0].color == ""){
+				blank = change[0];
+				piece = change[1];
+			} else {
+				blank = change[1];
+				piece = change[0];
+			}
+
+			board[piece.i][piece.j].color = "";
+			board[blank.i][blank.j].color = piece.color;
+		}
+	}
 }
 
 function heuristicValue(state){
 	// TODO
 	// blob field of white - blob field of black
+	// state.board is board at root state
+	// state.changes is changes on top of that
+	//// FOREACH SPACE
+	//// IF SPACE IS WHITE, ++
+	//// IF SPACE IS BLACK, --
+	//// IF SPACE IS BLANK AND TOUCHES WHITE AND NOT BLACK, ++
+	//// IF SPACE IS BLANK AND TOUCHES BLACK AND NOT WHITE, --
+	var i = 7, j, k, w, b, wvalue = 0, bvalue = 0, board = state.board, neighbors, worth;
+	applyChanges(board, state.changes);	
+	while (i--){
+		j = 7;
+		while (j--){
+			worth = (i == 0 || i == 6) + (j == 0 || j == 6) + (i == 0 || i == 6)*(j == 0 || j == 6) + 1;
+			switch (board[i][j].color){
+				case "white": wvalue += worth; break;
+				case "black": bvalue += worth; break;
+				case "":
+					neighbors = [board[i-1] && board[i-1][j-1] && board[i-1][j-1].color,
+						board[i-1] && board[i-1][j+1] && board[i-1][j+1].color,
+						board[i+1] && board[i+1][j-1] && board[i+1][j-1].color,
+						board[i+1] && board[i+1][j+1] && board[i+1][j+1].color,
+						board[i][j-1] && board[i][j-1].color,
+						board[i][j+1] && board[i][j+1].color,
+						board[i-1] && board[i-1][j].color,
+						board[i+1] && board[i+1][j].color];
+
+					k = 8;
+					w = 0;
+					b = 0;
+					while (k-- && !(w||b)){
+						if (neighbors[k] == "white"){
+							w = 1;
+						} else if (neighbors[k] == "black"){
+							b = 1;
+						}
+					}
+
+					if (w && !b){
+						++wvalue;
+					} else if (b && !w){
+						++bvalue;
+					}
+
+					break;
+			}
+		}
+	}
+
+	undoChanges(board, state.changes);
+	return {white:wvalue, black:bvalue};
 }
 
-// NOTE: minimax is a depth first search, so we can't use a timer based method
 function minimax(state, ply){
 	if (isTerminal(state) || ply <= 0){
-		return heuristicValue(state);
+		return {value:heuristicValue(state), state:state};
 	} else {
-		alpha = -Infinity;
+		var value = null;
+		var smallest = Infinity;
+		var largest = -Infinity;
+		var best = null;
+		var color = state.color;
+		var opcolor = color=="white"?"black":"white";
 
-		// NOTE: using callback form to simulate python's yield keyword
 		overChildren(state, function(child){
-			alpha = max(alpha, -minimax(child, ply-1));
+			if (child.changes[child.changes.length-1].length == 1){
+				var X = minimax(child, ply-1);
+				if (X.value[opcolor] < smallest || (X.value[opcolor] == smallest && X.value[color] > largest)){
+					value = X.value;
+					smallest = X.value[opcolor];
+					largest = X.value[color];
+					best = child;
+				}
+			}
 		});
 
-		return alpha;
+		return {value:value, state:best};
 	}
 }
 
@@ -141,11 +231,9 @@ function RandomAI(color, board){
 			}
 		});
 
-		//cb([{i:1, j:1, color:color}]);
 		cb(choice.changes[0]);
 	};
 
-	// ...
 	return self;
 }
 
@@ -155,10 +243,16 @@ function MinimaxAI(color, board){
 	self.board = board;
 	self.color = color;
 	self.choose = function(cb){
-		// ...
+		var root = new State(board, color);
+		var most = -Infinity;
+		var choice = minimax(root, 1).state;
+		if (choice == null){
+			cb([]);
+		} else {
+			cb(choice.changes[0]);
+		}
 	};
 
-	// ...
 	return self;
 }
 
