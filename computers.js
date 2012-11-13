@@ -93,6 +93,7 @@ function isTerminal(state){
 	return false;
 }
 
+// changes = [[{i:0, j:0, color:"white"}, ...], ...]
 function applyChanges(board, changes){
 	for (i in changes){
 		var change = changes[i];
@@ -142,6 +143,7 @@ function heuristicValue(state){
 		j = 7;
 		while (j--){
 			worth = (i == 0 || i == 6) + (j == 0 || j == 6) + (i == 0 || i == 6)*(j == 0 || j == 6) + 1;
+			worth = 1;
 			switch (board[i][j].color){
 				case "white": wvalue += worth; break;
 				case "black": bvalue += worth; break;
@@ -188,20 +190,26 @@ function minimax(state, ply){
 		var value = null;
 		var smallest = Infinity;
 		var largest = -Infinity;
+		var shortest = Infinity;
 		var best = null;
 		var color = state.color;
 		var opcolor = color=="white"?"black":"white";
 
 		overChildren(state, function(child){
-			if (child.changes[child.changes.length-1].length == 1){
+			//if (child.changes[child.changes.length-1].length == 1){
 				var X = minimax(child, ply-1);
-				if (X.value[opcolor] < smallest || (X.value[opcolor] == smallest && X.value[color] > largest)){
+				if (X.value[opcolor] < smallest ||
+					(X.value[opcolor] == smallest && X.value[color] > largest) ||
+					(X.value[opcolor] == smallest &&
+						X.value[color] == largest &&
+						child.changes[child.changes.length-1].length < shortest)){
 					value = X.value;
 					smallest = X.value[opcolor];
 					largest = X.value[color];
+					shortest = child.changes[child.changes.length-1].length;
 					best = child;
 				}
-			}
+			//}
 		});
 
 		return {value:value, state:best};
@@ -231,7 +239,9 @@ function RandomAI(color, board){
 			}
 		});
 
-		cb(choice.changes[0]);
+		setTimeout(function(){
+			cb(choice.changes[0]);
+		}, 1);
 	};
 
 	return self;
@@ -247,9 +257,13 @@ function MinimaxAI(color, board){
 		var most = -Infinity;
 		var choice = minimax(root, 1).state;
 		if (choice == null){
-			cb([]);
+			setTimeout(function(){
+				cb([]);
+			}, 1);
 		} else {
-			cb(choice.changes[0]);
+			setTimeout(function(){
+				cb(choice.changes[0]);
+			}, 1);
 		}
 	};
 

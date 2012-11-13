@@ -16,7 +16,9 @@ function HumanAI(color, board){
 				case board[i][j+1] && board[i][j+1].color:
 				case board[i-1] && board[i-1][j].color:
 				case board[i+1] && board[i+1][j].color:
-					callback([{i:i, j:j, color:color}]);
+					setTimeout(function(){
+						callback([{i:i, j:j, color:color}]);
+					}, 1);
 					selected = null;
 					break;
 
@@ -30,7 +32,9 @@ function HumanAI(color, board){
 				case board[i][j-2] && board[i][j-2].color:
 				case board[i][j+2] && board[i][j+2].color:
 					if (selected){
-						callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
+						setTimeout(function(){
+							callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
+						}, 1);
 						selected = null;
 					}
 
