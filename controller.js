@@ -17,12 +17,18 @@ function BlobsCtrl($scope){
 
 	$scope.board[0][0].color = $scope.board[6][6].color = "black";
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
+	$scope.counts = {white:2, black:2};
 
 	var whiteAI = HumanAI("white", $scope.board);
 	var blackAI = RandomAI("black", $scope.board);
+	//var blackAI = HumanAI("black", $scope.board);
 	$scope.activeAI = whiteAI;
 
-	// NOTE: makeMove will be defined by the time passTurn is called
+	function endGame(){
+		$scope.activeAI = null;
+		// TODO
+	}
+
 	function passTurn(){
 		console.log("passTurn", $scope.activeAI.color);
 		$scope.activeAI = $scope.activeAI==whiteAI? blackAI : whiteAI;
@@ -31,8 +37,8 @@ function BlobsCtrl($scope){
 
 	function winOrPass(){
 		console.log("winOrPass", $scope.activeAI.color);
-		if (false){ // TODO check for endgame
-			// ...
+		if ($scope.counts.white + $scope.counts.black == 49){
+			endGame();
 		} else {
 			passTurn();
 		}
@@ -45,6 +51,12 @@ function BlobsCtrl($scope){
 			// e.g., move = [{i:0, j:0, color:"white"}, ...]
 			for (m in move){
 				var change = move[m];
+				if (change.color == ""){
+					--$scope.counts[$scope.board[change.i][change.j].color];
+				} else {
+					++$scope.counts[change.color];
+				}
+
 				$scope.board[change.i][change.j].color = change.color;
 			}
 

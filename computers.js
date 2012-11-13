@@ -1,7 +1,9 @@
 //// STATE ////
 
 // NOTE: initialize WITH "new" keyword
-function State(board){
+function State(board, color){
+	this.board = board;
+	this.color = color;
 	// this.asdfasrgwerg = asdgasfdgasg
 	// ...
 
@@ -14,6 +16,78 @@ function State(board){
 //// HELPER FUNCTIONS ////
 
 function overChildren(state, cb){
+	var i = 7, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
+	while (i--){
+		j = 7;
+		while (j--){
+			if (board[i][j].color == ""){
+				// Add a piece next to an existing one
+				switch (color){
+					case board[i-1] && board[i-1][j-1] && board[i-1][j-1].color:
+					case board[i-1] && board[i-1][j+1] && board[i-1][j+1].color:
+					case board[i+1] && board[i+1][j-1] && board[i+1][j-1].color:
+					case board[i+1] && board[i+1][j+1] && board[i+1][j+1].color:
+					case board[i][j-1] && board[i][j-1].color:
+					case board[i][j+1] && board[i][j+1].color:
+					case board[i-1] && board[i-1][j].color:
+					case board[i+1] && board[i+1][j].color:
+						child = new State(board, opcolor);
+						child.changes.push([{i:i, j:j, color:color}]);
+						cb(child);
+						break;
+				}
+			} else if (board[i][j].color == color){
+				// Jump a piece
+				if (board[i-2] && board[i-2][j-2] && board[i-2][j-2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j-2, color:color}]);
+					cb(child);
+				}
+
+				if (board[i-2] && board[i-2][j+2] && board[i-2][j+2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j+2, color:color}]);
+					cb(child);
+				}
+
+				if (board[i+2] && board[i+2][j-2] && board[i+2][j-2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j-2, color:color}]);
+					cb(child);
+				}
+
+				if (board[i+2] && board[i+2][j+2] && board[i+2][j+2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j+2, color:color}]);
+					cb(child);
+				}
+
+				if (board[i-2] && board[i-2][j].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j, color:color}]);
+					cb(child);
+				}
+
+				if (board[i+2] && board[i+2][j].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j, color:color}]);
+					cb(child);
+				}
+
+				if (board[i][j-2] && board[i][j-2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i, j:j-2, color:color}]);
+					cb(child);
+				}
+
+				if (board[i][j+2] && board[i][j+2].color == ""){
+					child = new State(board, opcolor);
+					child.changes.push([{i:i, j:j, color:""}, {i:i, j:j+2, color:color}]);
+					cb(child);
+				}
+			}
+		}
+	}
 	// TODO
 	// build a child state, cb(child), repeat for all children
 	// remember to use palindromic pruning to not send two equivalent children
@@ -53,7 +127,7 @@ function RandomAI(color, board){
 	self.color = color;
 	self.board = board;
 	self.choose = function(cb){
-		var root = new State(board);
+		var root = new State(board, color);
 		var most = -Infinity;
 		var choice = null;
 
@@ -67,8 +141,8 @@ function RandomAI(color, board){
 			}
 		});
 
-		cb([{i:1, j:1, color:color}]);
-		//cb(choice.changes[0]);
+		//cb([{i:1, j:1, color:color}]);
+		cb(choice.changes[0]);
 	};
 
 	// ...

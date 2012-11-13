@@ -39,6 +39,11 @@ function HumanAI(color, board){
 		}
 	};
 
+	self.handlePass = function(){
+		callback([]);
+		selected = null;
+	}
+
 	self.choose = function(cb){
 		callback = cb;
 	};
