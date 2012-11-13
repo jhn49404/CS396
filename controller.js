@@ -24,11 +24,13 @@ function BlobsCtrl($scope){
 
 	// NOTE: makeMove will be defined by the time passTurn is called
 	function passTurn(){
+		console.log("passTurn", $scope.activeAI.color);
 		$scope.activeAI = $scope.activeAI==whiteAI? blackAI : whiteAI;
 		makeMove();
 	}
 
 	function winOrPass(){
+		console.log("winOrPass", $scope.activeAI.color);
 		if (false){ // TODO check for endgame
 			// ...
 		} else {
@@ -37,16 +39,15 @@ function BlobsCtrl($scope){
 	}
 
 	function makeMove(){
-		// NOTE: if choose is concurrent, then the stack will be cleared up here
+		console.log("makeMove", $scope.activeAI.color);
 		$scope.activeAI.choose(function(move){
 			// NOTE: move stores the changes to be made to the board
 			// e.g., move = [{i:0, j:0, color:"white"}, ...]
 			for (m in move){
 				var change = move[m];
-				board[change.i][change.j].color = change.color;
+				$scope.board[change.i][change.j].color = change.color;
 			}
 
-			$scope.$apply();
 			winOrPass();
 		});
 	}

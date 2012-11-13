@@ -53,25 +53,22 @@ function RandomAI(color, board){
 	self.color = color;
 	self.board = board;
 	self.choose = function(cb){
+		var root = new State(board);
+		var most = -Infinity;
+		var choice = null;
 
-		// NOTE: using setTimeout to implement concurrency
-		setTimeout(function(){
-			var root = new State(board);
-			var most = -Infinity;
-			var choice = null;
+		// NOTE: assigning each child a random value,
+		// keeping only the highest assigned.
+		overChildren(root, function(child){
+			var X = Math.random();
+			if (X > most){
+				most = X;
+				choice = child;
+			}
+		});
 
-			// NOTE: assigning each child a random value,
-			// keeping only the highest assigned.
-			overChildren(root, function(child){
-				var X = Math.random();
-				if (X > most){
-					most = X;
-					choice = child;
-				}
-			});
-
-			cb(choice.changes[0]);
-		}, 50);
+		cb([{i:1, j:1, color:color}]);
+		//cb(choice.changes[0]);
 	};
 
 	// ...
@@ -84,10 +81,7 @@ function MinimaxAI(color, board){
 	self.board = board;
 	self.color = color;
 	self.choose = function(cb){
-		// NOTE: using setTimeout to implement concurrency
-		setTimeout(function(){
-			// ...
-		}, 50);
+		// ...
 	};
 
 	// ...

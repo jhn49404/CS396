@@ -1,11 +1,47 @@
 function HumanAI(color, board){
 	var self = {};
 	self.color = color;
-	self.board = board;
-	self.choose = function(cb){
-		// ...
+	var selected = null;
+	self.handleClick = function(i, j){
+		if (board[i][j].color == color){
+			selected = {i:i, j:j};
+		} else if (board[i][j].color == ""){
+			switch (color){
+				// Add a piece next to an existing one
+				case board[i-1] && board[i-1][j-1] && board[i-1][j-1].color:
+				case board[i-1] && board[i-1][j+1] && board[i-1][j+1].color:
+				case board[i+1] && board[i+1][j-1] && board[i+1][j-1].color:
+				case board[i+1] && board[i+1][j+1] && board[i+1][j+1].color:
+				case board[i][j-1] && board[i][j-1].color:
+				case board[i][j+1] && board[i][j+1].color:
+				case board[i-1] && board[i-1][j].color:
+				case board[i+1] && board[i+1][j].color:
+					callback([{i:i, j:j, color:color}]);
+					selected = null;
+					break;
+
+				// Jump a piece
+				case board[i-2] && board[i-2][j-2] && board[i-2][j-2].color:
+				case board[i-2] && board[i-2][j+2] && board[i-2][j+2].color:
+				case board[i+2] && board[i+2][j-2] && board[i+2][j-2].color:
+				case board[i+2] && board[i+2][j+2] && board[i+2][j+2].color:
+				case board[i-2] && board[i-2][j].color:
+				case board[i+2] && board[i+2][j].color:
+				case board[i][j-2] && board[i][j-2].color:
+				case board[i][j+2] && board[i][j+2].color:
+					if (selected){
+						callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
+						selected = null;
+					}
+
+					break;
+			}
+		}
 	};
 
-	// ...
+	self.choose = function(cb){
+		callback = cb;
+	};
+
 	return self;
 }
