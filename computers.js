@@ -138,7 +138,7 @@ function heuristicValue(state){
 	//// IF SPACE IS BLANK AND TOUCHES WHITE AND NOT BLACK, ++
 	//// IF SPACE IS BLANK AND TOUCHES BLACK AND NOT WHITE, --
 	var i = 7, j, k, w, b, wvalue = 0, bvalue = 0, board = state.board, neighbors, worth;
-	applyChanges(board, state.changes);	
+	applyChanges(board, state.changes);
 	while (i--){
 		j = 7;
 		while (j--){
@@ -239,9 +239,7 @@ function RandomAI(color, board){
 			}
 		});
 
-		setTimeout(function(){
-			cb(choice.changes[0]);
-		}, 1);
+		cb(choice.changes[0]);
 	};
 
 	return self;
@@ -257,13 +255,9 @@ function MinimaxAI(color, board){
 		var most = -Infinity;
 		var choice = minimax(root, 1).state;
 		if (choice == null){
-			setTimeout(function(){
-				cb([]);
-			}, 1);
+			cb([]);
 		} else {
-			setTimeout(function(){
-				cb(choice.changes[0]);
-			}, 1);
+			cb(choice.changes[0]);
 		}
 	};
 

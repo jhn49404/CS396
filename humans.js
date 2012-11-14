@@ -32,9 +32,7 @@ function HumanAI(color, board){
 				case board[i][j-2] && board[i][j-2].color:
 				case board[i][j+2] && board[i][j+2].color:
 					if (selected){
-						setTimeout(function(){
-							callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
-						}, 1);
+						callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
 						selected = null;
 					}
 

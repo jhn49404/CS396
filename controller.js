@@ -20,10 +20,10 @@ function BlobsCtrl($scope){
 	$scope.counts = {white:2, black:2};
 
 	//var whiteAI = HumanAI("white", $scope.board);
-	//var whiteAI = RandomAI("white", $scope.board);
-	var whiteAI = MinimaxAI("white", $scope.board);
-	var blackAI = MinimaxAI("black", $scope.board);
-	//var blackAI = RandomAI("black", $scope.board);
+	var whiteAI = RandomAI("white", $scope.board);
+	//var whiteAI = MinimaxAI("white", $scope.board);
+	//var blackAI = MinimaxAI("black", $scope.board);
+	var blackAI = RandomAI("black", $scope.board);
 	//var blackAI = HumanAI("black", $scope.board);
 	$scope.activeAI = whiteAI;
 
@@ -61,10 +61,16 @@ function BlobsCtrl($scope){
 				}
 
 				$scope.board[change.i][change.j].color = change.color;
-				$scope.$apply();
 			}
 
-			winOrPass();
+			setTimeout(function(){
+				// NOTE: have to call apply here because the changes
+				// made in this thread are not tracked by angular.
+				// It will be best to remove this when we turn in
+				// the final, human vs AI, version.
+				$scope.$apply();
+				winOrPass();
+			}, 10);
 		});
 	}
 
