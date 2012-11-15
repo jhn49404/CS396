@@ -19,12 +19,12 @@ function BlobsCtrl($scope){
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
 	$scope.counts = {white:2, black:2};
 
-	//var whiteAI = HumanAI("white", $scope.board);
-	var whiteAI = RandomAI("white", $scope.board);
-	//var whiteAI = MinimaxAI("white", $scope.board);
-	//var blackAI = MinimaxAI("black", $scope.board);
-	var blackAI = RandomAI("black", $scope.board);
-	//var blackAI = HumanAI("black", $scope.board);
+	var whiteAI = HumanAI("white", $scope.board);
+	//var whiteAI = RandomAI("white", $scope.board);
+	//var whiteAI = MinimaxAI("white", $scope.board, 1);
+	//var blackAI = MinimaxAI("black", $scope.board, 3);
+	//var blackAI = RandomAI("black", $scope.board);
+	var blackAI = HumanAI("black", $scope.board);
 	$scope.activeAI = whiteAI;
 
 	function endGame(){

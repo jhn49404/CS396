@@ -5,7 +5,8 @@ function State(board, color){
 	this.board = board;
 	this.color = color; // who makes the next move
 	// NOTE: changes stores the changes made to the board
-	// e.g., changes[0] = [{i:0, j:0, color:"white"}, ...]
+	// e.g., this.move = changes[0] = [{i:0, j:0, color:"white"}, ...]
+	this.move = null;
 	this.changes = [];
 }
 
@@ -14,7 +15,15 @@ function State(board, color){
 
 function overChildren(state, cb){
 	// TODO use palindromic pruning to not send two equivalent children
-	var i = 7, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
+	var i, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
+	var changes = [], c = state.changes.length;
+	for (i = 0; i < state.changes.length; ++i){
+		changes.push(state.changes[i]);
+	}
+
+	changes.push(null);
+
+	i = 7;
 	while (i--){
 		j = 7;
 		while (j--){
@@ -30,7 +39,9 @@ function overChildren(state, cb){
 					case board[i-1] && board[i-1][j].color:
 					case board[i+1] && board[i+1][j].color:
 						child = new State(board, opcolor);
-						child.changes.push([{i:i, j:j, color:color}]);
+						child.changes = changes;
+						changes[c] = [{i:i, j:j, color:color}];
+						child.move = child.changes[0];
 						cb(child);
 						break;
 				}
@@ -38,49 +49,65 @@ function overChildren(state, cb){
 				// Jump a piece
 				if (board[i-2] && board[i-2][j-2] && board[i-2][j-2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j-2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i-2, j:j-2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i-2] && board[i-2][j+2] && board[i-2][j+2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j+2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i-2, j:j+2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i+2] && board[i+2][j-2] && board[i+2][j-2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j-2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i+2, j:j-2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i+2] && board[i+2][j+2] && board[i+2][j+2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j+2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i+2, j:j+2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i-2] && board[i-2][j].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i-2, j:j, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i-2, j:j, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i+2] && board[i+2][j].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i+2, j:j, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i+2, j:j, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i][j-2] && board[i][j-2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i, j:j-2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i, j:j-2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 
 				if (board[i][j+2] && board[i][j+2].color == ""){
 					child = new State(board, opcolor);
-					child.changes.push([{i:i, j:j, color:""}, {i:i, j:j+2, color:color}]);
+					child.changes = changes;
+					changes[c] = [{i:i, j:j, color:""}, {i:i, j:j+2, color:color}];
+					child.move = child.changes[0];
 					cb(child);
 				}
 			}
@@ -198,8 +225,8 @@ function minimax(state, ply){
 		overChildren(state, function(child){
 			//if (child.changes[child.changes.length-1].length == 1){
 				var X = minimax(child, ply-1);
-				if (X.value[opcolor] < smallest ||
-					(X.value[opcolor] == smallest && X.value[color] > largest) ||
+				if (X.value[color] > largest ||
+					(X.value[color] == largest && X.value[opcolor] < smallest) ||
 					(X.value[opcolor] == smallest &&
 						X.value[color] == largest &&
 						child.changes[child.changes.length-1].length < shortest)){
@@ -239,25 +266,25 @@ function RandomAI(color, board){
 			}
 		});
 
-		cb(choice.changes[0]);
+		cb(choice.move);
 	};
 
 	return self;
 }
 
 // NOTE: initialize WITHOUT "new" keyword
-function MinimaxAI(color, board){
+function MinimaxAI(color, board, ply){
 	var self = {};
 	self.board = board;
 	self.color = color;
 	self.choose = function(cb){
 		var root = new State(board, color);
 		var most = -Infinity;
-		var choice = minimax(root, 1).state;
+		var choice = minimax(root, ply).state;
 		if (choice == null){
 			cb([]);
 		} else {
-			cb(choice.changes[0]);
+			cb(choice.move);
 		}
 	};
 
