@@ -13,9 +13,9 @@ function State(board, color){
 
 //// HELPER FUNCTIONS ////
 
-function overChildren(state, cb){
-	// TODO use palindromic pruning to not send two equivalent children
+function overAddChildren(state, cb){
 	var i, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
+	var called = false;
 	var changes = [], c = state.changes.length;
 	for (i = 0; i < state.changes.length; ++i){
 		changes.push(state.changes[i]);
@@ -43,9 +43,30 @@ function overChildren(state, cb){
 						changes[c] = [{i:i, j:j, color:color}];
 						child.move = child.changes[0];
 						cb(child);
+						called = true;
 						break;
 				}
-			} else if (board[i][j].color == color){
+			}
+		}
+	}
+
+	return called;
+}
+
+function overJumpChildren(state, cb){
+	var i, j, child, board = state.board, color = state.color, opcolor = color=="white"?"black":"white";
+	var changes = [], c = state.changes.length;
+	for (i = 0; i < state.changes.length; ++i){
+		changes.push(state.changes[i]);
+	}
+
+	changes.push(null);
+
+	i = 7;
+	while (i--){
+		j = 7;
+		while (j--){
+			if (board[i][j].color == color){
 				// Jump a piece
 				if (board[i-2] && board[i-2][j-2] && board[i-2][j-2].color == ""){
 					child = new State(board, opcolor);
@@ -115,6 +136,10 @@ function overChildren(state, cb){
 	}
 }
 
+function overChildren(state, cb){
+	overAddChildren(state, cb) || overJumpChildren(state, cb);
+}
+
 function isTerminal(state){
 	// TODO
 	return false;
@@ -155,88 +180,108 @@ function undoChanges(board, changes){
 }
 
 function heuristicValue(state){
-	// TODO
-	// blob field of white - blob field of black
-	// state.board is board at root state
-	// state.changes is changes on top of that
-	//// FOREACH SPACE
-	//// IF SPACE IS WHITE, ++
-	//// IF SPACE IS BLACK, --
-	//// IF SPACE IS BLANK AND TOUCHES WHITE AND NOT BLACK, ++
-	//// IF SPACE IS BLANK AND TOUCHES BLACK AND NOT WHITE, --
-	var i = 7, j, k, w, b, wvalue = 0, bvalue = 0, board = state.board, neighbors, worth;
-	applyChanges(board, state.changes);
-	while (i--){
-		j = 7;
-		while (j--){
-			worth = (i == 0 || i == 6) + (j == 0 || j == 6) + (i == 0 || i == 6)*(j == 0 || j == 6) + 1;
-			worth = 1;
-			switch (board[i][j].color){
-				case "white": wvalue += worth; break;
-				case "black": bvalue += worth; break;
-				case "":
-					neighbors = [board[i-1] && board[i-1][j-1] && board[i-1][j-1].color,
-						board[i-1] && board[i-1][j+1] && board[i-1][j+1].color,
-						board[i+1] && board[i+1][j-1] && board[i+1][j-1].color,
-						board[i+1] && board[i+1][j+1] && board[i+1][j+1].color,
-						board[i][j-1] && board[i][j-1].color,
-						board[i][j+1] && board[i][j+1].color,
-						board[i-1] && board[i-1][j].color,
-						board[i+1] && board[i+1][j].color];
+	var value = 0, board = state.board, semiboard = [], neighbors;
 
-					k = 8;
-					w = 0;
-					b = 0;
-					while (k-- && !(w||b)){
-						if (neighbors[k] == "white"){
-							w = 1;
-						} else if (neighbors[k] == "black"){
-							b = 1;
+	applyChanges(board, state.changes);
+
+	// First Pass: count white - black, init semiboard
+	for (var i = 0; i < 7; ++i){
+		semiboard.push([]);
+		for (var j = 0; j < 7; ++j){
+			semiboard[i][j] = {w:0, b:0};
+
+			if (board[i][j].color == "white"){
+				++value;
+			} else if (board[i][j].color == "black"){
+				--value;
+			}
+		}
+	}
+
+	// Second Pass: give values to semiboard
+	for (var i = 0; i < 7; ++i){
+		for (var j = 0; j < 7; ++j){
+			switch (board[i][j].color){
+				default: break;
+				case "white": 
+				case "black":
+					neighbors = [board[i-1] && board[i-1][j-1] && board[i-1][j-1].color, i-1, j-1,
+						board[i-1] && board[i-1][j+1] && board[i-1][j+1].color, i-1, j+1,
+						board[i+1] && board[i+1][j-1] && board[i+1][j-1].color, i+1, j-1,
+						board[i+1] && board[i+1][j+1] && board[i+1][j+1].color, i+1, j+1,
+						board[i][j-1] && board[i][j-1].color, i, j-1,
+						board[i][j+1] && board[i][j+1].color, i, j+1,
+						board[i-1] && board[i-1][j].color, i-1, j,
+						board[i+1] && board[i+1][j].color, i+1, j];
+
+					for (var k = 0; k < 25; k += 3){
+						if (neighbors[k] == "" && board[i][j].color == "white"){
+							semiboard[neighbors[k+1]][neighbors[k+2]].w = 1;
+						} else if (neighbors[k] == "" && board[i][j].color == "black"){
+							semiboard[neighbors[k+1]][neighbors[k+2]].b = 1;
+						}
+					}
+			}
+		}
+	}
+
+	// Third Pass: use semiboard values to count semiwhite - semiblack
+	for (var i = 0; i < 7; ++i){
+		for (var j = 0; j < 7; ++j){
+			switch (board[i][j].color){
+				default: break;
+				case "":
+					neighbors = [board[i-1] && board[i-1][j-1] && board[i-1][j-1].color, i-1, j-1,
+						board[i-1] && board[i-1][j+1] && board[i-1][j+1].color, i-1, j+1,
+						board[i+1] && board[i+1][j-1] && board[i+1][j-1].color, i+1, j-1,
+						board[i+1] && board[i+1][j+1] && board[i+1][j+1].color, i+1, j+1,
+						board[i][j-1] && board[i][j-1].color, i, j-1,
+						board[i][j+1] && board[i][j+1].color, i, j+1,
+						board[i-1] && board[i-1][j].color, i-1, j,
+						board[i+1] && board[i+1][j].color, i+1, j];
+
+					var semiwhite = semiboard[i][j].w && !semiboard[i][j].b;
+					var semiblack = !semiboard[i][j].w && semiboard[i][j].b;
+					for (var k = 0; k < 25; k += 3){
+						if (typeof neighbors[k] != "undefined"){ // undefined means not on the board
+
+							// if a neighbor is white or a neighbor is touching white, i can't be black
+							if (neighbors[k] == "white" || semiboard[neighbors[k+1]][neighbors[k+2]].w){
+								semiblack = false;
+							}
+
+							// vice versa
+							if (neighbors[k] == "black" || semiboard[neighbors[k+1]][neighbors[k+2]].b){
+								semiwhite = false;
+							}
 						}
 					}
 
-					if (w && !b){
-						++wvalue;
-					} else if (b && !w){
-						++bvalue;
+					if (semiwhite){
+						++value;
+					} else if (semiblack){
+						--value;
 					}
-
-					break;
 			}
 		}
 	}
 
 	undoChanges(board, state.changes);
-	return {white:wvalue, black:bvalue};
+	return {white: value, black: -value}; // naturally, white maximizes and black minimizes
 }
 
 function minimax(state, ply){
 	if (isTerminal(state) || ply <= 0){
-		return {value:heuristicValue(state), state:state};
+		return {value:heuristicValue(state)[state.color], state:state};
 	} else {
-		var value = null;
-		var smallest = Infinity;
-		var largest = -Infinity;
-		var shortest = Infinity;
+		var value = -Infinity;
 		var best = null;
-		var color = state.color;
-		var opcolor = color=="white"?"black":"white";
-
 		overChildren(state, function(child){
-			//if (child.changes[child.changes.length-1].length == 1){
 				var X = minimax(child, ply-1);
-				if (X.value[color] > largest ||
-					(X.value[color] == largest && X.value[opcolor] < smallest) ||
-					(X.value[opcolor] == smallest &&
-						X.value[color] == largest &&
-						child.changes[child.changes.length-1].length < shortest)){
-					value = X.value;
-					smallest = X.value[opcolor];
-					largest = X.value[color];
-					shortest = child.changes[child.changes.length-1].length;
+				if (-X.value > value){
+					value = -X.value;
 					best = child;
 				}
-			//}
 		});
 
 		return {value:value, state:best};
@@ -260,6 +305,29 @@ function RandomAI(color, board){
 		// keeping only the highest assigned.
 		overChildren(root, function(child){
 			var X = Math.random();
+			if (X > most){
+				most = X;
+				choice = child;
+			}
+		});
+
+		cb(choice.move);
+	};
+
+	return self;
+}
+
+// NOTE: initialize WITHOUT "new" keyword
+function HeuristicAI(color, board){
+	var self = {};
+	self.color = color;
+	self.board = board;
+	self.choose = function(cb){
+		var root = new State(board, color);
+		var most = -Infinity;
+		var choice = null;
+		overChildren(root, function(child){
+			var X = heuristicValue(child)[color];
 			if (X > most){
 				most = X;
 				choice = child;

@@ -22,9 +22,9 @@ function BlobsCtrl($scope){
 	var whiteAI = HumanAI("white", $scope.board);
 	//var whiteAI = RandomAI("white", $scope.board);
 	//var whiteAI = MinimaxAI("white", $scope.board, 1);
-	//var blackAI = MinimaxAI("black", $scope.board, 3);
+	var blackAI = MinimaxAI("black", $scope.board, 3);
 	//var blackAI = RandomAI("black", $scope.board);
-	var blackAI = HumanAI("black", $scope.board);
+	//var blackAI = HeuristicAI("black", $scope.board);
 	$scope.activeAI = whiteAI;
 
 	function endGame(){
@@ -33,13 +33,11 @@ function BlobsCtrl($scope){
 	}
 
 	function passTurn(){
-		console.log("passTurn", $scope.activeAI.color);
 		$scope.activeAI = $scope.activeAI==whiteAI? blackAI : whiteAI;
 		makeMove();
 	}
 
 	function winOrPass(){
-		console.log("winOrPass", $scope.activeAI.color);
 		if ($scope.counts.white + $scope.counts.black == 49){
 			endGame();
 		} else {
@@ -48,7 +46,6 @@ function BlobsCtrl($scope){
 	}
 
 	function makeMove(){
-		console.log("makeMove", $scope.activeAI.color);
 		$scope.activeAI.choose(function(move){
 			// NOTE: move stores the changes to be made to the board
 			// e.g., move = [{i:0, j:0, color:"white"}, ...]
@@ -70,7 +67,7 @@ function BlobsCtrl($scope){
 				// the final, human vs AI, version.
 				$scope.$apply();
 				winOrPass();
-			}, 10);
+			}, 1);
 		});
 	}
 
