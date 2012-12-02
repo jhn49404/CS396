@@ -15,24 +15,30 @@ function BlobsCtrl($scope){
 		}
 	}
 
-	//$scope.board[0][0].color = $scope.board[6][6].color = $scope.board[1][1].color = "black";
 	$scope.board[0][0].color = $scope.board[6][6].color = "black";
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
-	//$scope.counts = {white:2, black:3};
-	$scope.counts = {white:2, black:2};
+	$scope.board.counts = {white:2, black:2};
+	$scope.template = "start_template.html";
 
-	//var whiteAI = HumanAI("white", $scope.board);
-	var whiteAI = RandomAI("white", $scope.board);
+	var whiteAI = HumanAI("white", $scope.board);
+	//var whiteAI = RandomAI("white", $scope.board);
 	//var whiteAI = MinimaxAI("white", $scope.board, 1);
 	var blackAI = MinimaxAI("black", $scope.board, 3);
 	//var blackAI = RandomAI("black", $scope.board);
 	//var blackAI = HeuristicAI("black", $scope.board);
-	$scope.activeAI = whiteAI;
+
+	$scope.whiteAI = whiteAI;
+	$scope.blackAI = blackAI;
+	$scope.start = function(first){
+		$scope.template = "game_template.html";		
+		$scope.activeAI = first;
+		makeMove();
+	};
 
 	function endGame(){
 		$scope.activeAI = null;
 		// case of reloading page on "ok", nothing on "cancel"
-		if ($scope.counts.white > $scope.counts.black){
+		if ($scope.board.counts.white > $scope.board.counts.black){
 			var r = confirm("You win! Start a new game?");
 			if (r == true){location.href = 'index.html';}	// refresh the page
 		} else {
@@ -47,7 +53,7 @@ function BlobsCtrl($scope){
 	}
 
 	function winOrPass(){
-		if ($scope.counts.white + $scope.counts.black == 49){
+		if ($scope.board.counts.white + $scope.board.counts.black == 49){
 			endGame();
 		} else {
 			passTurn();
@@ -61,9 +67,9 @@ function BlobsCtrl($scope){
 			for (m in move){
 				var change = move[m];
 				if (change.color == ""){
-					--$scope.counts[$scope.board[change.i][change.j].color];
+					--$scope.board.counts[$scope.board[change.i][change.j].color];
 				} else {
-					++$scope.counts[change.color];
+					++$scope.board.counts[change.color];
 				}
 
 				$scope.board[change.i][change.j].color = change.color;
@@ -72,13 +78,9 @@ function BlobsCtrl($scope){
 			setTimeout(function(){
 				// NOTE: have to call apply here because the changes
 				// made in this thread are not tracked by angular.
-				// It will be best to remove this when we turn in
-				// the final, human vs AI, version.
 				$scope.$apply();
 				winOrPass();
 			}, 1);
 		});
 	}
-
-	makeMove();
 }

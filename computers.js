@@ -1,6 +1,6 @@
 //// STATE ////
 
-// NOTE: initialize WITH "new" keyword
+// State Object
 function State(board, color){
 	this.board = board;
 	this.color = color; // who makes the next move
@@ -141,8 +141,7 @@ function overChildren(state, cb){
 }
 
 function isTerminal(state){
-	// TODO
-	return false;
+	return state.board.counts.white + state.board.counts.black == 49;
 }
 
 // changes = [[{i:0, j:0, color:"white"}, ...], ...]
@@ -304,7 +303,7 @@ function minimax(state, ply){
 
 //// AI CLASSES ////
 
-// NOTE: initialize WITHOUT "new" keyword
+// Factory for a RandomAI object
 function RandomAI(color, board){
 	var self = {};
 	self.color = color;
@@ -330,7 +329,7 @@ function RandomAI(color, board){
 	return self;
 }
 
-// NOTE: initialize WITHOUT "new" keyword
+// Factory for a HeuristicAI object
 function HeuristicAI(color, board){
 	var self = {};
 	self.color = color;
@@ -353,7 +352,7 @@ function HeuristicAI(color, board){
 	return self;
 }
 
-// NOTE: initialize WITHOUT "new" keyword
+// Factory for a MinimaxAI object
 function MinimaxAI(color, board, ply){
 	var self = {};
 	self.board = board;
@@ -371,15 +370,3 @@ function MinimaxAI(color, board, ply){
 
 	return self;
 }
-
-// NOTE: State is initialized with the "new" keyword,
-// whereas the AI classes are not. This is because,
-// in Javascript, objects initialized using the "new"
-// method are initialized faster, whereas those initialized
-// with the "self" method have their properties looked up faster.
-// Because we are making a LOT of states in overChildren,
-// we want them to be initialized as quickly as possible.
-// Because we only initialize the AI once (when BlobCtrl loads),
-// we use the "self" method for them.
-// Think of "new" style objects as c structs, and "self" style
-// objects as python objects.

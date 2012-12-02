@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app>
 	<head>
-		<title>gudenof</title>
+		<title>Blobs</title>
 		<script type="text/javascript" src="libs/angular-1.0.2/angular.min.js"></script>
 		<script type="text/javascript" src="humans.js"></script>
 		<script type="text/javascript" src="computers.js"></script>
@@ -34,18 +34,24 @@
 				border-left: 1px solid black;
 			}
 		</style>
-	</head>
-	<body ng-controller="BlobsCtrl">
-		<div class="board">
-			<div class="row" ng-repeat="row in board">
-				<div class="cell" ng-repeat="cell in row" ng-click="activeAI.handleClick(cell.i, cell.j)">
-					<img ng-show="cell.color" ng-src="img/{{cell.color}}.png" />
+		<script type="text/ng-template" id="start_template.html">
+			<input type="button" ng-click="start(whiteAI)" value="Go First (easy)?" />
+			<input type="button" ng-click="start(blackAI)" value="Or Go Last (hard)?" />
+		</script>
+		<script type="text/ng-template" id="game_template.html">
+			<div class="board">
+				<div class="row" ng-repeat="row in board">
+					<div class="cell" ng-repeat="cell in row" ng-click="activeAI.handleClick(cell.i, cell.j)">
+						<img ng-show="cell.color" ng-src="img/{{cell.color}}.png" />
+					</div>
 				</div>
 			</div>
-		</div>
-		<button ng-click="activeAI.handlePass()">Pass Turn</button>
-		<INPUT TYPE="button" onclick="history.go(0)" VALUE="Restart">
-		<h1 style="color:#fff">White: {{counts.white}}</h1>
-		<h1 style="color:#000">Black: {{counts.black}}</h1>
+			<button ng-click="activeAI.handlePass()">Pass Turn</button>
+			<input type="button" onclick="history.go(0)" value="Restart" />
+			<h1 style="color:#fff">White: {{board.counts.white}}</h1>
+			<h1 style="color:#000">Black: {{board.counts.black}}</h1>
+		</script>
+	</head>
+	<body ng-controller="BlobsCtrl" ng-include="template">
 	</body>
 </html>
