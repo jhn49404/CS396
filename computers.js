@@ -270,17 +270,30 @@ function heuristicValue(state){
 	return {white: value, black: -value}; // naturally, white maximizes and black minimizes
 }
 
+// Compiled version for a little extra speed
+// Compiled with http://closure-compiler.appspot.com/home
+heuristicValue=function(h){var g=0,c=h.board,f=[],e;applyChanges(c,h.changes);for(var a=0;7>a;++a){f.push([]);for(var b=0;7>b;++b)f[a][b]={b:0,a:0},"white"==c[a][b].color?++g:"black"==c[a][b].color&&--g}for(a=0;7>a;++a)for(b=0;7>b;++b)switch(c[a][b].color){case "white":case "black":e=[c[a-1]&&c[a-1][b-1]&&c[a-1][b-1].color,a-1,b-1,c[a-1]&&c[a-1][b+1]&&c[a-1][b+1].color,a-1,b+1,c[a+1]&&c[a+1][b-1]&&c[a+1][b-1].color,a+1,b-1,c[a+1]&&c[a+1][b+1]&&c[a+1][b+1].color,a+1,b+1,c[a][b-1]&&c[a][b-1].color,a,b-1,c[a][b+
+1]&&c[a][b+1].color,a,b+1,c[a-1]&&c[a-1][b].color,a-1,b,c[a+1]&&c[a+1][b].color,a+1,b];for(var d=0;25>d;d+=3)""==e[d]&&"white"==c[a][b].color?f[e[d+1]][e[d+2]].b=1:""==e[d]&&"black"==c[a][b].color&&(f[e[d+1]][e[d+2]].a=1)}for(a=0;7>a;++a)for(b=0;7>b;++b)switch(c[a][b].color){case "":e=[c[a-1]&&c[a-1][b-1]&&c[a-1][b-1].color,a-1,b-1,c[a-1]&&c[a-1][b+1]&&c[a-1][b+1].color,a-1,b+1,c[a+1]&&c[a+1][b-1]&&c[a+1][b-1].color,a+1,b-1,c[a+1]&&c[a+1][b+1]&&c[a+1][b+1].color,a+1,b+1,c[a][b-1]&&c[a][b-1].color,
+a,b-1,c[a][b+1]&&c[a][b+1].color,a,b+1,c[a-1]&&c[a-1][b].color,a-1,b,c[a+1]&&c[a+1][b].color,a+1,b];for(var i=f[a][b].b&&!f[a][b].a,j=!f[a][b].b&&f[a][b].a,d=0;25>d;d+=3)if("undefined"!=typeof e[d]){if("white"==e[d]||f[e[d+1]][e[d+2]].b)j=!1;if("black"==e[d]||f[e[d+1]][e[d+2]].a)i=!1}i?++g:j&&--g}undoChanges(c,h.changes);return{white:g,black:-g}};
+
 function minimax(state, ply){
 	if (isTerminal(state) || ply <= 0){
 		return {value:heuristicValue(state)[state.color], state:state};
 	} else {
 		var value = -Infinity;
+		var localvalue = -Infinity;
 		var best = null;
 		overChildren(state, function(child){
 				var X = minimax(child, ply-1);
 				if (-X.value > value){
 					value = -X.value;
 					best = child;
+				} else if (-X.value == value){
+					var Y = heuristicValue(child)[state.color];
+					if (Y > localvalue){
+						localvalue = Y;
+						best = child;
+					}
 				}
 		});
 

@@ -15,12 +15,14 @@ function BlobsCtrl($scope){
 		}
 	}
 
+	//$scope.board[0][0].color = $scope.board[6][6].color = $scope.board[1][1].color = "black";
 	$scope.board[0][0].color = $scope.board[6][6].color = "black";
 	$scope.board[0][6].color = $scope.board[6][0].color = "white";
+	//$scope.counts = {white:2, black:3};
 	$scope.counts = {white:2, black:2};
 
-	var whiteAI = HumanAI("white", $scope.board);
-	//var whiteAI = RandomAI("white", $scope.board);
+	//var whiteAI = HumanAI("white", $scope.board);
+	var whiteAI = RandomAI("white", $scope.board);
 	//var whiteAI = MinimaxAI("white", $scope.board, 1);
 	var blackAI = MinimaxAI("black", $scope.board, 3);
 	//var blackAI = RandomAI("black", $scope.board);
@@ -29,7 +31,14 @@ function BlobsCtrl($scope){
 
 	function endGame(){
 		$scope.activeAI = null;
-		// TODO
+		// case of reloading page on "ok", nothing on "cancel"
+		if ($scope.counts.white > $scope.counts.black){
+			var r = confirm("You win! Start a new game?");
+			if (r == true){location.href = 'index.html';}	// refresh the page
+		} else {
+			var r = confirm("You lost... Start a new game?");
+			if (r == true){location.href = 'index.html';}	// refresh the page
+		}
 	}
 
 	function passTurn(){

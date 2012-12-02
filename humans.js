@@ -23,17 +23,22 @@ function HumanAI(color, board){
 					break;
 
 				// Jump a piece
-				case board[i-2] && board[i-2][j-2] && board[i-2][j-2].color:
-				case board[i-2] && board[i-2][j+2] && board[i-2][j+2].color:
-				case board[i+2] && board[i+2][j-2] && board[i+2][j-2].color:
-				case board[i+2] && board[i+2][j+2] && board[i+2][j+2].color:
-				case board[i-2] && board[i-2][j].color:
-				case board[i+2] && board[i+2][j].color:
-				case board[i][j-2] && board[i][j-2].color:
-				case board[i][j+2] && board[i][j+2].color:
+				// case board[i-2] && board[i-2][j-2] && board[i-2][j-2].color:
+				// case board[i-2] && board[i-2][j+2] && board[i-2][j+2].color:
+				// case board[i+2] && board[i+2][j-2] && board[i+2][j-2].color:
+				// case board[i+2] && board[i+2][j+2] && board[i+2][j+2].color:
+				// case board[i-2] && board[i-2][j].color:
+				// case board[i+2] && board[i+2][j].color:
+				// case board[i][j-2] && board[i][j-2].color:
+				// case board[i][j+2] && board[i][j+2].color:
+				default:
 					if (selected){
-						callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
-						selected = null;
+						if ((Math.abs(selected.i - i) == 2 && Math.abs(selected.j - j) == 2) ||
+							(Math.abs(selected.i - i) == 2 && selected.j - j == 0) ||
+							(selected.i - i == 0 && Math.abs(selected.j - j) == 2)){
+							callback([{i:selected.i, j:selected.j, color:""}, {i:i, j:j, color:color}]);
+							selected = null;
+						}
 					}
 
 					break;
